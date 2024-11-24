@@ -1,37 +1,56 @@
 
- //TASK ONE: NUMBER GUESSING GAME
-
+ // TASK2 SIMPLE CALCULATOR
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
- using namespace std;
+using namespace std;
+
 int main() {
+    char choice;
 
-    srand(time(0));
+    do {
+        double number1, number2;
+        char operation;
 
-    int randomNumber = rand() % 100 + 1;
-    int guess = 0;
+    cout << "Enter first number:   " << endl;
+    cin >> number1;
+    cout << "choose operation below (+, -, *, /):  "<< endl;
+    cin >> operation;
+    cout << "Enter second number:    "<< endl;
+    cin >>  number2;
 
-    cout << "Welcome to the Number Guessing Game!" << endl;
-    cout << "I have selected a random number between 1 and 100." << endl;
-    cout << "can you guess it? then you can START!" << endl;
-    cout << "\n";
-    cout << "*****GOODLUCK*****"<< endl;
-   while (true) {
-        cout << "Enter your guess:    ";
-        cin >> guess;
+    double result;
+    bool validOperation = true;
 
-        if (guess > randomNumber) {
-            cout << "\nToo high! Try again.\n\n";
-        } else if (guess < randomNumber) {
-            cout << "\nToo low! Try again.\n\n";
-        } else {
-            cout << "\nCongratulations! You guessed the correct number: "
-                      << randomNumber << "\n\n";
+    switch(operation) {
+        case '+':
+            result = number1 + number2;
             break;
-        }
+        case '-':
+            result = number1 - number2;
+            break;
+        case '*':
+            result = number1 * number2;
+            break;
+        case '/':
+            if (number2 != 0) {
+                result = number1 / number2;
+            } else {
+                cout << "Error: any number divide by zero is invalid " << endl;
+                validOperation = false;
+            }
+            break;
+        default:
+            cout << "Error: operation dont exist " << endl;
+            validOperation = false;
     }
 
+    if (validOperation) {
+        cout << "Result: " << result << endl;
+    }
 
+        cout << "Do you want to perform another calculation? (y/n): ";
+        cin >> choice;
+    } while (choice == 'y' || choice == 'Y');
+
+    cout << "Thank you for using the calculator. Goodbye!" << endl;
     return 0;
 }
