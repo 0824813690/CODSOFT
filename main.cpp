@@ -1,172 +1,98 @@
+// Tic-Tac-Toe game: TASK 3.
 #include <iostream>
 #include <vector>
-#include <string>
-#include <iomanip>
 using namespace std;
 
-
-struct Book {
-    string title;
-    string author;
-    string isbn;
-    bool isAvailable;
-};
-
-
-void Menu() {
-    cout << "**** LIBRARY MANAGEMENT SYSTEM ****"<<endl;
-    cout << "1. Add a Book"<< endl;
-    cout << "2. Search for a Book"<< endl;
-    cout << "3. Check Out a Book"<< endl;
-    cout << "4. Return a Book"<< endl;
-    cout << "5. Display All Books"<< endl;
-    cout << "6. Exit"<< endl;
-    cout << "****Enter your choice: "<< endl;
+void displayBoard(const vector<vector<char>>& board) {
+    cout << "\n";
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << board[i][j];
+            if (j < 2) cout << " | ";
+        }
+        cout << "\n";
+        if (i < 2) cout << "--+---+--\n";
+    }
+    cout << "\n";
 }
 
 
-void addBook(vector<Book>& books) {
-    Book newBook;
-    cout << "Enter book title: ";
-    cin.ignore();
-    getline(cin, newBook.title);
-    cout << "Enter book author: ";
-    getline(cin, newBook.author);
-    cout << "Enter book ISBN: ";
-    getline(cin, newBook.isbn);
-    newBook.isAvailable = true;
-    books.push_back(newBook);
-    cout << "Book added successfully!" << endl;
-}
+bool checkWin(const vector<vector<char>>& board, char player) {
 
-
-void searchBook(const vector<Book>& books) {
-    string query;
-    cout << "Enter title, author, or ISBN to search: ";
-    cin.ignore();
-    getline(cin, query);
-
-    bool found = false;
-    for (const auto& book : books) {
-        if (book.title == query || book.author == query || book.isbn == query) {
-            cout << "Book Found:\n";
-            cout << "Title: " << book.title << "\n";
-            cout << "Author: " << book.author << "\n";
-            cout << "ISBN: " << book.isbn << "\n";
-            cout << "Status: " << (book.isAvailable ? "Available" : "Checked Out") << "\n";
-            found = true;
-            break;
+    for (int i = 0; i < 3; i++) {
+        if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||
+            (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {
+            return true;
         }
     }
-
-    if (!found) {
-        cout << "book not available .\n";
+    if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
+        (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
+        return true;
     }
+    return false;
 }
 
 
-void checkOutBook(vector<Book>& books) {
-    string isbn;
-    cout << "Enter ISBN of the book to check out: ";
-    cin.ignore();
-    getline(cin, isbn);
-
-    for (auto& book : books) {
-        if (book.isbn == isbn) {
-            if (book.isAvailable) {
-                book.isAvailable = false;
-                cout << "Book checked out successfully!\n";
-                return;
-            } else {
-                cout << "Book is already checked out.\n";
-                return;
+bool checkDraw(const vector<vector<char>>& board) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == ' ') {
+                return false;
             }
         }
     }
-
-    cout << "Book not found.\n";
+    return true;
 }
 
 
-void returnBook(vector<Book>& books) {
-    string isbn;
-    cout << "Enter your book ISBN to return: ";
-    cin.ignore();
-    getline(cin, isbn);
+void playGame() {
+    vector<vector<char>> board(3, vector<char>(3, ' '));
+    char currentPlayer = 'X';
+    bool gameRunning = true;
 
-    for (auto& book : books) {
-        if (book.isbn == isbn) {
-            if (!book.isAvailable) {
-                book.isAvailable = true;
-                cout << "Book returned successfully!"<< endl;
-                return;
-            } else {
-                cout << "Book was not checked out."<< endl;
-                return;
-            }
+    while (gameRunning) {
+        displayBoard(board);
+
+
+        int row, col;
+        cout << "Player " << currentPlayer << ", enter your move (row and column, 1-3): ";
+        cin >> row >> col;
+        row--; col--;
+
+
+        if (row < 0 || row >= 3 || col < 0 || col >= 3 || board[row][col] != ' ') {
+            cout << "Invalid move. Try again.\n";
+            continue;
         }
-    }
-
-    cout << "Book not found."<< endl;
-}
 
 
-void displayBooks(const vector<Book>& books) {
-    if (books.empty()) {
-        cout << "No books available."<< endl;
-        return;
-    }
+        board[row][col] = currentPlayer;
 
-    cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(15) << "ISBN" << "Status\n";
-    cout << "_________________________________________________________________________________________" << endl;
-    for (const auto& book : books) {
-        cout << left << setw(30) << book.title
-             << setw(20) << book.author
-             << setw(15) << book.isbn
-             << (book.isAvailable ? "Available" : "Checked Out") << "\n";
+
+        if (checkWin(board, currentPlayer)) {
+            displayBoard(board);
+            cout << "Player " << currentPlayer << " wins!"<<endl;
+            gameRunning = false;
+        } else if (checkDraw(board)) {
+            displayBoard(board);
+            cout << "It's a draw!"<<endl;
+            gameRunning = false;
+        } else {
+
+            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        }
     }
 }
 
 
 int main() {
-    vector<Book> books;
-    int choice;
-
+    char playAgain;
     do {
-        Menu();
-        cin >> choice;
+        playGame();
+        cout << "Do you want to play again? (y/n): ";
+        cin >> playAgain;
+    } while (playAgain == 'y' || playAgain == 'Y');
 
-        switch (choice) {
-            case 1:
-                addBook(books);
-                break;
-
-            case 2:
-                searchBook(books);
-                break;
-
-            case 3:
-                checkOutBook(books);
-                break;
-
-            case 4:
-                returnBook(books);
-                break;
-
-            case 5:
-                displayBooks(books);
-                break;
-
-            case 6:
-                cout << "Exiting program. Goodbye!" << endl;
-                break;
-
-            default:
-                cout << "Invalid choice. Try again."<< endl;
-        }
-
-        cout << endl;
-    } while (choice != 6);
-
+    cout << "Thanks for playing!\n";
     return 0;
 }
